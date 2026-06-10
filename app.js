@@ -189,7 +189,8 @@ function doLogin() {
   if(!users[email] || users[email].password !== pass) { errEl.textContent='Incorrect email or password.'; errEl.style.display='block'; return; }
   errEl.style.display='none';
   currentUser = users[email];
-  store.set('session', email);
+  const remember = document.getElementById('remember-me').checked;
+  if(remember) store.set('session', email);
   launchApp();
 }
 
