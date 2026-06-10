@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#7F77DD">
+<title>BoredOut — Never be bored again</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- AUTH -->
+<div class="auth-overlay" id="auth-overlay">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <h1><i class="ti ti-mood-happy" style="vertical-align:-3px"></i> BoredOut</h1>
+      <p>Find things to do. Find people to do them with.</p>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Sign in</button>
+      <button class="auth-tab" onclick="switchAuthTab('signup')">Create account</button>
+    </div>
+    <div id="auth-login">
+      <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="your@email.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"></div>
+      <div id="login-error" style="color:var(--danger);font-size:13px;margin-bottom:10px;display:none"></div>
+      <button class="btn btn-primary btn-block" onclick="doLogin()">Sign in <i class="ti ti-arrow-right"></i></button>
+      <p style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:1rem">No account? <a href="#" onclick="switchAuthTab('signup');return false" style="color:var(--primary)">Sign up free</a></p>
+    </div>
+    <div id="auth-signup" style="display:none">
+      <div class="form-group"><label>Full name</label><input type="text" id="signup-name" placeholder="Your name"></div>
+      <div class="form-group"><label>Email</label><input type="email" id="signup-email" placeholder="your@email.com"></div>
+      <div class="form-group"><label>Password</label><input type="password" id="signup-password" placeholder="Min. 6 characters"></div>
+      <div class="form-group"><label>What are you into? (pick at least 2)</label><div class="interests-grid" id="interests-grid"></div></div>
+      <div id="signup-error" style="color:var(--danger);font-size:13px;margin-bottom:10px;display:none"></div>
+      <button class="btn btn-primary btn-block" onclick="doSignup()">Create account <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="main-app" style="display:none">
+
+<nav>
+  <div class="nav-logo" onclick="goTo('discover')"><i class="ti ti-mood-happy" aria-hidden="true"></i> BoredOut</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="goTo('discover')" id="tab-discover"><i class="ti ti-map-search" aria-hidden="true"></i> Discover</button>
+    <button class="nav-tab" onclick="goTo('people')" id="tab-people"><i class="ti ti-users" aria-hidden="true"></i> People</button>
+    <button class="nav-tab" onclick="goTo('plans')" id="tab-plans"><i class="ti ti-calendar-event" aria-hidden="true"></i> Plans</button>
+    <button class="nav-tab" onclick="goTo('friends')" id="tab-friends"><i class="ti ti-heart" aria-hidden="true"></i> Friends</button>
+  </div>
+  <div class="nav-right">
+    <button class="nav-bored-btn" onclick="openBored()"><i class="ti ti-sparkles" aria-hidden="true"></i><span>I'm bored!</span></button>
+    <button class="level-chip" onclick="goTo('profile')" id="level-chip" title="Your level & streak"></button>
+    <button class="icon-btn" id="notif-btn" onclick="toggleNotifPanel()"><i class="ti ti-bell" aria-hidden="true"></i><span class="badge" id="notif-badge" style="display:none"></span></button>
+    <button class="avatar-btn" id="nav-avatar" onclick="goTo('profile')"></button>
+  </div>
+</nav>
+
+<!-- DISCOVER -->
+<div class="page active" id="page-discover">
+  <div class="install-banner" id="install-banner">
+    <i class="ti ti-device-mobile" aria-hidden="true"></i>
+    <p><strong>Install BoredOut</strong>Add it to your home screen — works like a real app, even offline.</p>
+    <button class="btn btn-primary btn-sm" onclick="doInstall()">Install</button>
+    <button class="icon-btn" onclick="dismissInstall()"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="hero">
+    <h1 id="hero-greeting">What do you want to do today?</h1>
+    <p id="hero-sub">Find activities near you and people who are down to hang right now.</p>
+    <div class="location-bar">
+      <input type="text" id="location-input" placeholder="Your city...">
+      <button class="btn btn-white btn-sm" onclick="detectLocation()"><i class="ti ti-current-location" aria-hidden="true"></i> Near me</button>
+    </div>
+    <button class="hero-bored-btn" onclick="openBored()"><i class="ti ti-sparkles" aria-hidden="true"></i> I'm bored — surprise me!</button>
+  </div>
+  <div class="section-header"><span class="section-title"><i class="ti ti-wand" aria-hidden="true"></i>Picked for you</span></div>
+  <div class="foryou-row" id="foryou-row"></div>
+  <div class="section-header"><span class="section-title">Browse by vibe</span></div>
+  <div class="category-grid" id="cat-grid"></div>
+  <div class="section-header">
+    <span class="section-title" id="activities-title">All activities near you</span>
+    <button class="btn btn-outline btn-sm" onclick="shuffleActivities()"><i class="ti ti-refresh" aria-hidden="true"></i> Shuffle</button>
+  </div>
+  <div class="filter-row" id="filter-row"></div>
+  <div class="activity-grid" id="activity-grid"></div>
+</div>
+
+<!-- PEOPLE -->
+<div class="page" id="page-people">
+  <div style="margin-bottom:1rem">
+    <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:3px">People near you</h2>
+    <p style="color:var(--text-muted);font-size:13px">Find someone to hang out with right now</p>
+  </div>
+  <div class="mode-toggle">
+    <button id="mode-browse" class="active" onclick="setPeopleMode('browse')"><i class="ti ti-layout-grid" style="font-size:14px;vertical-align:-2px"></i> Browse</button>
+    <button id="mode-match" onclick="setPeopleMode('match')"><i class="ti ti-bolt" style="font-size:14px;vertical-align:-2px"></i> Quick match</button>
+  </div>
+  <div id="people-browse">
+    <div class="search-bar"><i class="ti ti-search" aria-hidden="true"></i><input type="text" placeholder="Search by name or vibe..." id="people-search" oninput="renderPeople()"></div>
+    <div class="filter-row" id="people-filter-row"></div>
+    <div class="people-grid" id="people-grid"></div>
+  </div>
+  <div id="people-match" style="display:none">
+    <div class="deck-wrap" id="deck-wrap"></div>
+  </div>
+</div>
+
+<!-- PLANS -->
+<div class="page" id="page-plans">
+  <div class="section-header" style="margin-bottom:1rem">
+    <div>
+      <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:3px">Your plans</h2>
+      <p style="color:var(--text-muted);font-size:13px">Upcoming hangouts and activities</p>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="openCreatePlan()"><i class="ti ti-plus" aria-hidden="true"></i> New plan</button>
+  </div>
+  <div class="filter-row">
+    <button class="filter-pill active" onclick="filterPlans('all',this)">All</button>
+    <button class="filter-pill" onclick="filterPlans('confirmed',this)">Confirmed</button>
+    <button class="filter-pill" onclick="filterPlans('pending',this)">Pending</button>
+  </div>
+  <div class="plans-list" id="plans-list"></div>
+</div>
+
+<!-- FRIENDS -->
+<div class="page" id="page-friends">
+  <div style="margin-bottom:1rem">
+    <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:3px">Your crew</h2>
+    <p style="color:var(--text-muted);font-size:13px">Friends and connection requests</p>
+  </div>
+  <div class="friends-tabs">
+    <button class="ftab active" onclick="showFTab('friends')" id="ftab-friends">Friends <span id="friends-count"></span></button>
+    <button class="ftab" onclick="showFTab('requests')" id="ftab-requests">Requests <span class="req-badge" id="req-count-badge" style="display:none"></span></button>
+    <button class="ftab" onclick="showFTab('suggestions')" id="ftab-suggestions">Suggestions</button>
+  </div>
+  <div id="friends-panel"></div>
+  <div id="requests-panel" style="display:none"></div>
+  <div id="suggestions-panel" style="display:none"></div>
+</div>
+
+<!-- PROFILE -->
+<div class="page" id="page-profile"><div id="profile-content"></div></div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bottom-nav-inner">
+    <button class="bnav-item active" onclick="goTo('discover')" id="bnav-discover"><i class="ti ti-map-search" aria-hidden="true"></i>Discover</button>
+    <button class="bnav-item" onclick="goTo('people')" id="bnav-people"><i class="ti ti-users" aria-hidden="true"></i>People</button>
+    <div class="bnav-bored">
+      <button class="bnav-bored-circle" onclick="openBored()" aria-label="I'm bored"><i class="ti ti-sparkles"></i></button>
+      <div class="bnav-bored-label">Bored?</div>
+    </div>
+    <button class="bnav-item" onclick="goTo('friends')" id="bnav-friends"><i class="ti ti-heart" aria-hidden="true"></i>Friends<span class="bnav-badge" id="bnav-req-badge" style="display:none"></span></button>
+    <button class="bnav-item" onclick="goTo('profile')" id="bnav-profile"><i class="ti ti-user" aria-hidden="true"></i>Profile</button>
+  </div>
+</div>
+
+</div><!-- /main-app -->
+
+<!-- I'M BORED OVERLAY -->
+<div class="bored-overlay" id="bored-overlay">
+  <div class="bored-box">
+    <h2><i class="ti ti-sparkles"></i> Here's your boredom cure</h2>
+    <div class="suggest-card" id="suggest-card"></div>
+    <button class="bored-close" onclick="closeBored()"><i class="ti ti-x" style="vertical-align:-2px"></i> Close</button>
+  </div>
+</div>
+
+<!-- ACTIVITY DETAIL MODAL -->
+<div class="modal-overlay" id="detail-overlay" onclick="if(event.target===this)closeDetail()">
+  <div class="modal" id="detail-modal"></div>
+</div>
+
+<!-- CREATE PLAN MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closePlanModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Create a plan</h2>
+      <button class="icon-btn" onclick="closePlanModal()"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="form-group"><label>What are you doing?</label><input type="text" id="plan-title" placeholder="e.g. Coffee & city walk"></div>
+    <div class="form-group"><label>Activity type</label>
+      <select id="plan-type">
+        <option>Outdoor adventure</option><option>Food & drinks</option><option>Arts & culture</option>
+        <option>Sports & fitness</option><option>Games & entertainment</option><option>Just chilling</option>
+      </select>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="form-group"><label>Date</label><input type="date" id="plan-date"></div>
+      <div class="form-group"><label>Time</label><input type="time" id="plan-time"></div>
+    </div>
+    <div class="form-group"><label>Location</label><input type="text" id="plan-location" placeholder="Where are you meeting?"></div>
+    <div class="form-group"><label>Invite a friend</label><input type="text" id="plan-invite" placeholder="Friend's name..."></div>
+    <div class="form-group"><label>Notes</label><textarea id="plan-notes" placeholder="What to bring, details..."></textarea></div>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button class="btn btn-outline" onclick="closePlanModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="createPlan()"><i class="ti ti-check" aria-hidden="true"></i> Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-header">
+    <div class="person-avatar" id="chat-avatar" style="width:36px;height:36px;font-size:13px"></div>
+    <h3 id="chat-name">Chat</h3>
+    <span id="chat-online" style="font-size:12px;color:var(--accent)"></span>
+    <button class="icon-btn btn-sm" onclick="closeChat()"><i class="ti ti-x" aria-hidden="true"></i></button>
+  </div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-input-row">
+    <input type="text" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()">
+    <button class="chat-send" onclick="sendMessage()"><i class="ti ti-send" aria-hidden="true"></i></button>
+  </div>
+</div>
+
+<!-- NOTIFICATIONS -->
+<div class="notif-panel" id="notif-panel">
+  <div class="notif-panel-header">
+    <h3>Notifications</h3>
+    <button class="btn btn-outline btn-sm" onclick="markAllRead()">Mark all read</button>
+  </div>
+  <div class="notif-list" id="notif-list"></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"><i class="ti ti-check" aria-hidden="true" id="toast-icon"></i><span id="toast-msg"></span></div>
+
+<script src="app.js"></script>
+</body>
+</html>
