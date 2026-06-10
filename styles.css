@@ -79,6 +79,10 @@ html.dark .level-chip { color: #CECBF6; }
 .location-bar input { flex: 1; min-width: 0; padding: 9px 13px; border-radius: var(--radius-sm); border: none; font-size: 14px; background: rgba(255,255,255,0.15); color: white; }
 .location-bar input::placeholder { color: rgba(255,255,255,0.6); }
 .location-bar input:focus { outline: 2px solid white; }
+.weather-bar { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); border-radius: 10px; padding: 8px 14px; margin-bottom: 12px; font-size: 13px; font-weight: 500; color: white; flex-wrap: wrap; }
+.weather-bar span { opacity: 0.92; }
+.weather-sep { opacity: 0.5; }
+#weather-tip { opacity: 0.8; font-style: italic; }
 .hero-bored-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 460px; margin-top: 12px; padding: 16px; border-radius: var(--radius); border: none; cursor: pointer; font-size: 17px; font-weight: 800; color: var(--primary-dark); background: white; transition: transform 0.15s, box-shadow 0.15s; position: relative; z-index: 1; }
 .hero-bored-btn:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
 .hero-bored-btn:active { transform: scale(0.97); }

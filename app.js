@@ -289,7 +289,8 @@ function detectLocation() {
   input.value = 'Detecting...';
   navigator.geolocation.getCurrentPosition(
     pos => {
-      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`)
+      const {latitude: lat, longitude: lon} = pos.coords;
+      fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
         .then(r=>r.json())
         .then(d=>{
           const city = d.address.city||d.address.town||d.address.village||d.address.county||'Your area';
@@ -298,9 +299,48 @@ function detectLocation() {
           store.set('u_'+currentUser.email+'_location', input.value);
           showToast(`Location set to ${input.value}`);
         }).catch(()=>{ input.value='New York, NY'; });
+      fetchWeather(lat, lon);
     },
     () => { input.value='New York, NY'; }
   );
+}
+
+const WMO_CODES = {
+  0:'Clear sky',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',
+  45:'Foggy',48:'Icy fog',51:'Light drizzle',53:'Drizzle',55:'Heavy drizzle',
+  61:'Light rain',63:'Rain',65:'Heavy rain',71:'Light snow',73:'Snow',75:'Heavy snow',
+  80:'Rain showers',81:'Heavy showers',82:'Violent showers',95:'Thunderstorm',96:'Thunderstorm w/ hail',
+};
+const WMO_ICON = {
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'🌨️',73:'❄️',75:'❄️',80:'🌦️',81:'🌧️',82:'⛈️',95:'⛈️',96:'⛈️',
+};
+
+function fetchWeather(lat, lon) {
+  fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,windspeed_10m&temperature_unit=fahrenheit&windspeed_unit=mph`)
+    .then(r => r.json())
+    .then(d => {
+      const c = d.current;
+      const code = c.weathercode;
+      const temp = Math.round(c.temperature_2m);
+      const desc = WMO_CODES[code] || 'Unknown';
+      const icon = WMO_ICON[code] || '🌡️';
+      const isRainy = [51,53,55,61,63,65,80,81,82,95,96].includes(code);
+      const isCold = temp < 40;
+      const isHot = temp > 90;
+      const tip = isRainy ? 'Rainy — great day for indoor activities' :
+                  isCold  ? 'Bundle up if heading outside!' :
+                  isHot   ? 'Hot out — stay hydrated!' :
+                  'Great weather to get out there!';
+      const bar = document.getElementById('weather-bar');
+      document.getElementById('weather-icon').textContent = icon;
+      document.getElementById('weather-temp').textContent = `${temp}°F`;
+      document.getElementById('weather-desc').textContent = desc;
+      document.getElementById('weather-tip').textContent = tip;
+      bar.style.display = 'flex';
+      store.set('weather', {code, temp, desc, icon, isRainy, isCold, isHot});
+    }).catch(() => {});
 }
 
 /* ════════ SUGGESTION ENGINE ════════ */
@@ -317,6 +357,12 @@ function scoreActivity(a) {
   score += overlap * 3;
   if(DAYPART_CATS[dayPart()].includes(a.cat)) score += 2;
   if(a.cost==='Free') score += 0.5;
+  const wx = store.get('weather');
+  if(wx) {
+    if(wx.isRainy && a.cat==='outdoor') score -= 4;
+    if(!wx.isRainy && a.cat==='outdoor') score += 1.5;
+    if(wx.isCold && ['outdoor','sports'].includes(a.cat)) score -= 1;
+  }
   return score;
 }
 
