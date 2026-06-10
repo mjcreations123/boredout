@@ -67,7 +67,7 @@ html.dark .level-chip { color: #CECBF6; }
 
 /* ── PAGES ────────────────────────────────────── */
 .page { display: none; padding: 1.25rem; max-width: 1100px; margin: 0 auto; animation: fadeIn 0.25s ease; }
-.page.active { display: block; }
+.page.active { display: block; padding-bottom: 2rem; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 /* ── HERO ─────────────────────────────────────── */
@@ -342,7 +342,7 @@ html.dark .suggest-why { color: #9FE1CB; }
   .nav-bored-btn span { display: none; }
   .nav-bored-btn { padding: 8px 12px; }
   .bottom-nav { display: block; }
-  body { padding-bottom: var(--bottom-nav-h); }
+  body { padding-bottom: calc(var(--bottom-nav-h) + 32px); }
   .hero h1 { font-size: 1.3rem; }
   .page { padding: 1rem; }
   .category-grid { grid-template-columns: repeat(4, 1fr); }

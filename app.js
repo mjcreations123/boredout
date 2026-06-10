@@ -69,6 +69,7 @@ const store = {
   set: (k,v) => localStorage.setItem('bo_'+k, JSON.stringify(v)),
 };
 let currentUser = null;
+let toastTimer = null;
 function getUsers() { return store.get('users') || {}; }
 function saveUsers(u) { store.set('users', u); }
 function getUserData(key) { return store.get('u_'+currentUser.email+'_'+key) || []; }
@@ -1104,7 +1105,7 @@ function goTo(page) {
 }
 
 /* ════════ TOAST ════════ */
-let toastTimer;
+
 function showToast(msg, kind, icon) {
   const t = document.getElementById('toast');
   t.classList.toggle('achievement', kind==='achievement');
