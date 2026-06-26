@@ -12,11 +12,12 @@ import notifications from './routes/notifications.js';
 
 const app = new Hono();
 
-// CORS — allow any Netlify deploy + local dev ports.
+// CORS — allow any Cloudflare Pages deploy + local dev ports.
 app.use('*', cors({
   origin: (origin) => {
     if (!origin) return origin;
-    if (/\.netlify\.(app|live)$/.test(origin)) return origin;
+    if (/\.pages\.dev$/.test(origin)) return origin;
+    if (/^https:\/\/boredout\.pages\.dev$/.test(origin)) return origin;
     if (/^http:\/\/(localhost|127\.0\.0\.1):(4173|3000|5173|8787)$/.test(origin)) return origin;
     return null;
   },
