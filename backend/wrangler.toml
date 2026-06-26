@@ -1,0 +1,15 @@
+name = "boredout-api"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+
+# D1 (SQLite) binding. Create the DB with:
+#   npx wrangler d1 create boredout
+# then paste the printed database_id below.
+[[d1_databases]]
+binding = "DB"
+database_name = "boredout"
+database_id = "cf7d43c5-3972-49f7-9fd7-7f999d921d66"
+
+# JWT_SECRET is a secret, NOT a plain var. Set it with:
+#   npx wrangler secret put JWT_SECRET
+# (For `wrangler dev` locally, put it in a .dev.vars file — see .dev.vars.example.)

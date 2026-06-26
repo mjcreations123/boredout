@@ -3,16 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#7F77DD">
-<meta name="description" content="Find things to do near you and people to do them with. Beat boredom in one tap with BoredOut.">
+<meta name="theme-color" content="#F1ECE4">
+<meta name="description" content="Find things to do near you and people to do them with. BoredOut turns an idle afternoon into a plan.">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="BoredOut">
-<meta property="og:title" content="BoredOut — Never be bored again">
-<meta property="og:description" content="Find things to do near you and people to do them with. Beat boredom in one tap.">
+<meta property="og:title" content="BoredOut — Find something to do">
+<meta property="og:description" content="Find things to do near you and people to do them with. Turn an idle afternoon into a plan.">
 <meta property="og:type" content="website">
-<title>BoredOut — Never be bored again</title>
+<title>BoredOut — Find something to do</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon.svg">
@@ -21,6 +21,9 @@
 <script>
 (function(){try{var t=JSON.parse(localStorage.getItem('bo_theme'))||'auto';var d=t==='dark'||(t==='auto'&&window.matchMedia('(prefers-color-scheme: dark)').matches);if(d)document.documentElement.classList.add('dark');}catch(e){}})();
 </script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -30,7 +33,7 @@
 <div class="auth-overlay" id="auth-overlay">
   <div class="auth-box">
     <div class="auth-logo">
-      <h1><i class="ti ti-mood-happy" style="vertical-align:-3px"></i> BoredOut</h1>
+      <h1>BoredOut</h1>
       <p>Find things to do. Find people to do them with.</p>
     </div>
     <div class="auth-tabs">
@@ -38,19 +41,19 @@
       <button class="auth-tab" onclick="switchAuthTab('signup')">Create account</button>
     </div>
     <div id="auth-login">
-      <div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" placeholder="your@email.com" autocomplete="email"></div>
+      <div class="form-group"><label for="login-email">Email</label><input type="email" id="login-email" placeholder="you@email.com" autocomplete="email"></div>
       <div class="form-group"><label for="login-password">Password</label><input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"></div>
       <div id="login-error" class="form-error" style="display:none"></div>
       <label class="remember-row">
-        <input type="checkbox" id="remember-me" checked> Remember me
+        <input type="checkbox" id="remember-me" checked> Keep me signed in
       </label>
       <button class="btn btn-primary btn-block" onclick="doLogin()">Sign in <i class="ti ti-arrow-right"></i></button>
-      <p class="auth-switch">No account? <a href="#" onclick="switchAuthTab('signup');return false">Sign up free</a></p>
+      <p class="auth-switch">New here? <a href="#" onclick="switchAuthTab('signup');return false">Create an account</a></p>
     </div>
     <div id="auth-signup" style="display:none">
       <div class="form-group"><label for="signup-name">Full name</label><input type="text" id="signup-name" placeholder="Your name" autocomplete="name"></div>
-      <div class="form-group"><label for="signup-email">Email</label><input type="email" id="signup-email" placeholder="your@email.com" autocomplete="email"></div>
-      <div class="form-group"><label for="signup-password">Password</label><input type="password" id="signup-password" placeholder="Min. 6 characters" autocomplete="new-password"></div>
+      <div class="form-group"><label for="signup-email">Email</label><input type="email" id="signup-email" placeholder="you@email.com" autocomplete="email"></div>
+      <div class="form-group"><label for="signup-password">Password</label><input type="password" id="signup-password" placeholder="At least 6 characters" autocomplete="new-password"></div>
       <div class="form-group">
         <label>What are you into? <span id="interest-count" class="interest-count">0 selected</span></label>
         <p class="field-hint">We use these to suggest activities you'll actually like.</p>
@@ -63,18 +66,22 @@
 </div>
 
 <!-- APP -->
+<div id="app-loading" style="display:none;position:fixed;inset:0;z-index:999;background:var(--paper);align-items:center;justify-content:center;flex-direction:column;gap:16px">
+  <div style="width:40px;height:40px;border-radius:50%;border:2.5px solid var(--line-strong);border-top-color:var(--accent);animation:spin 0.8s linear infinite"></div>
+  <p style="color:var(--text-muted);font-size:14px">Loading…</p>
+</div>
 <div id="main-app" style="display:none">
 
 <nav>
-  <div class="nav-logo" onclick="goTo('discover')"><i class="ti ti-mood-happy" aria-hidden="true"></i> BoredOut</div>
+  <div class="nav-logo" onclick="goTo('discover')">BoredOut</div>
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="goTo('discover')" id="tab-discover"><i class="ti ti-map-search" aria-hidden="true"></i> Discover</button>
+    <button class="nav-tab active" onclick="goTo('discover')" id="tab-discover"><i class="ti ti-compass" aria-hidden="true"></i> Discover</button>
     <button class="nav-tab" onclick="goTo('people')" id="tab-people"><i class="ti ti-users" aria-hidden="true"></i> People</button>
     <button class="nav-tab" onclick="goTo('plans')" id="tab-plans"><i class="ti ti-calendar-event" aria-hidden="true"></i> Plans</button>
-    <button class="nav-tab" onclick="goTo('friends')" id="tab-friends"><i class="ti ti-heart" aria-hidden="true"></i> Friends</button>
+    <button class="nav-tab" onclick="goTo('friends')" id="tab-friends"><i class="ti ti-users-group" aria-hidden="true"></i> Friends</button>
   </div>
   <div class="nav-right">
-    <button class="nav-bored-btn" onclick="openBored()"><i class="ti ti-sparkles" aria-hidden="true"></i><span>I'm bored!</span></button>
+    <button class="nav-bored-btn" onclick="openBored()"><i class="ti ti-dice-5" aria-hidden="true"></i><span>Surprise me</span></button>
     <button class="level-chip" onclick="goTo('profile')" id="level-chip" title="Your level & streak"></button>
     <button class="icon-btn" id="notif-btn" onclick="toggleNotifPanel()" aria-label="Notifications" aria-haspopup="true" aria-controls="notif-panel" aria-expanded="false"><i class="ti ti-bell" aria-hidden="true"></i><span class="badge" id="notif-badge" style="display:none"></span></button>
     <button class="avatar-btn" id="nav-avatar" onclick="goTo('profile')" aria-label="Your profile"></button>
@@ -91,9 +98,9 @@
   </div>
   <div class="hero" id="hero">
     <h1 id="hero-greeting">What do you want to do today?</h1>
-    <p id="hero-sub">Find activities near you and people who are down to hang right now.</p>
+    <p id="hero-sub">Discover what's happening near you, and the people who are up for it.</p>
     <div class="location-bar">
-      <input type="text" id="location-input" placeholder="Your city..." aria-label="Your location">
+      <input type="text" id="location-input" placeholder="Your city" aria-label="Your location">
       <button class="btn btn-white btn-sm" onclick="detectLocation(true)"><i class="ti ti-current-location" aria-hidden="true"></i> Near me</button>
     </div>
     <div class="weather-bar" id="weather-bar" style="display:none">
@@ -103,7 +110,7 @@
       <span class="weather-sep">·</span>
       <span id="weather-tip"></span>
     </div>
-    <button class="hero-bored-btn" onclick="openBored()"><i class="ti ti-sparkles" aria-hidden="true"></i> I'm bored — surprise me!</button>
+    <button class="hero-bored-btn" onclick="openBored()"><i class="ti ti-dice-5" aria-hidden="true"></i> Surprise me</button>
   </div>
 
   <div class="mood-section">
@@ -116,7 +123,7 @@
     </div>
   </div>
 
-  <div class="section-header"><span class="section-title"><i class="ti ti-wand" aria-hidden="true"></i>Picked for you</span></div>
+  <div class="section-header"><span class="section-title"><i class="ti ti-sparkles" aria-hidden="true"></i>Picked for you</span></div>
   <div class="foryou-row" id="foryou-row"></div>
 
   <div id="recent-section" style="display:none">
@@ -124,29 +131,29 @@
     <div class="foryou-row" id="recent-row"></div>
   </div>
 
-  <div class="section-header"><span class="section-title">Browse by vibe</span></div>
+  <div class="section-header"><span class="section-title">Browse by category</span></div>
   <div class="category-grid" id="cat-grid"></div>
   <div class="section-header">
     <span class="section-title" id="activities-title">All activities near you</span>
-    <button class="btn btn-outline btn-sm" onclick="shuffleActivities()"><i class="ti ti-refresh" aria-hidden="true"></i> Shuffle</button>
+    <button class="btn btn-outline btn-sm" onclick="shuffleActivities()"><i class="ti ti-arrows-shuffle" aria-hidden="true"></i> Shuffle</button>
   </div>
-  <div class="search-bar"><i class="ti ti-search" aria-hidden="true"></i><input type="text" placeholder="Search activities..." id="activity-search" oninput="renderActivities()" aria-label="Search activities"></div>
+  <div class="search-bar"><i class="ti ti-search" aria-hidden="true"></i><input type="text" placeholder="Search activities" id="activity-search" oninput="renderActivities()" aria-label="Search activities"></div>
   <div class="filter-row" id="filter-row"></div>
   <div class="activity-grid" id="activity-grid"></div>
 </div>
 
 <!-- PEOPLE -->
 <div class="page" id="page-people">
-  <div style="margin-bottom:1rem">
+  <div style="margin-bottom:1.25rem">
     <h2 class="page-title">People near you</h2>
-    <p class="page-subtitle">Find someone to hang out with right now</p>
+    <p class="page-subtitle">Find someone to share a plan with</p>
   </div>
   <div class="mode-toggle">
     <button id="mode-browse" class="active" onclick="setPeopleMode('browse')"><i class="ti ti-layout-grid" style="font-size:14px;vertical-align:-2px"></i> Browse</button>
     <button id="mode-match" onclick="setPeopleMode('match')"><i class="ti ti-bolt" style="font-size:14px;vertical-align:-2px"></i> Quick match</button>
   </div>
   <div id="people-browse">
-    <div class="search-bar"><i class="ti ti-search" aria-hidden="true"></i><input type="text" placeholder="Search by name or vibe..." id="people-search" oninput="renderPeople()" aria-label="Search people"></div>
+    <div class="search-bar"><i class="ti ti-search" aria-hidden="true"></i><input type="text" placeholder="Search by name or interest" id="people-search" oninput="renderPeople()" aria-label="Search people"></div>
     <div class="filter-row" id="people-filter-row"></div>
     <div class="people-grid" id="people-grid"></div>
   </div>
@@ -157,7 +164,7 @@
 
 <!-- PLANS -->
 <div class="page" id="page-plans">
-  <div class="section-header" style="margin-bottom:1rem">
+  <div class="section-header" style="margin-bottom:1.25rem">
     <div>
       <h2 class="page-title">Your plans</h2>
       <p class="page-subtitle">Upcoming hangouts and activities</p>
@@ -174,8 +181,8 @@
 
 <!-- FRIENDS -->
 <div class="page" id="page-friends">
-  <div style="margin-bottom:1rem">
-    <h2 class="page-title">Your crew</h2>
+  <div style="margin-bottom:1.25rem">
+    <h2 class="page-title">Your people</h2>
     <p class="page-subtitle">Friends and connection requests</p>
   </div>
   <div class="friends-tabs">
@@ -194,23 +201,23 @@
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
-    <button class="bnav-item active" onclick="goTo('discover')" id="bnav-discover"><i class="ti ti-map-search" aria-hidden="true"></i>Discover</button>
+    <button class="bnav-item active" onclick="goTo('discover')" id="bnav-discover"><i class="ti ti-compass" aria-hidden="true"></i>Discover</button>
     <button class="bnav-item" onclick="goTo('people')" id="bnav-people"><i class="ti ti-users" aria-hidden="true"></i>People</button>
     <div class="bnav-bored">
-      <button class="bnav-bored-circle" onclick="openBored()" aria-label="I'm bored"><i class="ti ti-sparkles"></i></button>
-      <div class="bnav-bored-label">Bored?</div>
+      <button class="bnav-bored-circle" onclick="openBored()" aria-label="Surprise me"><i class="ti ti-dice-5"></i></button>
+      <div class="bnav-bored-label">Surprise</div>
     </div>
-    <button class="bnav-item" onclick="goTo('friends')" id="bnav-friends"><i class="ti ti-heart" aria-hidden="true"></i>Friends<span class="bnav-badge" id="bnav-req-badge" style="display:none"></span></button>
+    <button class="bnav-item" onclick="goTo('friends')" id="bnav-friends"><i class="ti ti-users-group" aria-hidden="true"></i>Friends<span class="bnav-badge" id="bnav-req-badge" style="display:none"></span></button>
     <button class="bnav-item" onclick="goTo('profile')" id="bnav-profile"><i class="ti ti-user" aria-hidden="true"></i>Profile</button>
   </div>
 </div>
 
 </div><!-- /main-app -->
 
-<!-- I'M BORED OVERLAY -->
+<!-- SURPRISE OVERLAY -->
 <div class="bored-overlay" id="bored-overlay" onclick="if(event.target===this)closeBored()">
-  <div class="bored-box" role="dialog" aria-modal="true" aria-label="Your boredom cure">
-    <h2><i class="ti ti-sparkles"></i> Here's your boredom cure</h2>
+  <div class="bored-box" role="dialog" aria-modal="true" aria-label="Something to do">
+    <h2>Here's an idea</h2>
     <div class="suggest-card" id="suggest-card"></div>
     <button class="bored-close" onclick="closeBored()"><i class="ti ti-x" style="vertical-align:-2px"></i> Close</button>
   </div>
@@ -238,7 +245,7 @@
       <h2 id="plan-modal-title">Create a plan</h2>
       <button class="icon-btn" onclick="closePlanModal()" aria-label="Close"><i class="ti ti-x" aria-hidden="true"></i></button>
     </div>
-    <div class="form-group"><label for="plan-title">What are you doing?</label><input type="text" id="plan-title" placeholder="e.g. Coffee & city walk"></div>
+    <div class="form-group"><label for="plan-title">What are you doing?</label><input type="text" id="plan-title" placeholder="e.g. Coffee & a city walk"></div>
     <div class="form-group"><label for="plan-type">Activity type</label>
       <select id="plan-type">
         <option value="social">Just chilling</option>
@@ -254,8 +261,8 @@
       <div class="form-group"><label for="plan-time">Time</label><input type="time" id="plan-time"></div>
     </div>
     <div class="form-group"><label for="plan-location">Location</label><input type="text" id="plan-location" placeholder="Where are you meeting?"></div>
-    <div class="form-group"><label for="plan-invite">Invite a friend</label><input type="text" id="plan-invite" placeholder="Friend's name..."></div>
-    <div class="form-group"><label for="plan-notes">Notes</label><textarea id="plan-notes" placeholder="What to bring, details..."></textarea></div>
+    <div class="form-group"><label for="plan-invite">Invite a friend</label><input type="text" id="plan-invite" placeholder="Friend's name"></div>
+    <div class="form-group"><label for="plan-notes">Notes</label><textarea id="plan-notes" placeholder="What to bring, details…"></textarea></div>
     <div id="plan-error" class="form-error" style="display:none"></div>
     <div style="display:flex;gap:10px;justify-content:flex-end">
       <button class="btn btn-outline" onclick="closePlanModal()">Cancel</button>
@@ -267,15 +274,15 @@
 <!-- CHAT -->
 <div class="chat-panel" id="chat-panel">
   <div class="chat-header">
-    <div class="person-avatar" id="chat-avatar" style="width:36px;height:36px;font-size:13px"></div>
+    <div class="person-avatar" id="chat-avatar" style="width:36px;height:36px;font-size:14px"></div>
     <h3 id="chat-name">Chat</h3>
-    <span id="chat-online" style="font-size:12px;color:var(--accent)"></span>
+    <span id="chat-online" style="font-size:12px;color:var(--good)"></span>
     <button class="icon-btn btn-sm" onclick="closeChat()" aria-label="Close chat"><i class="ti ti-x" aria-hidden="true"></i></button>
   </div>
   <div class="chat-messages" id="chat-messages"></div>
   <div class="chat-emoji-bar" id="chat-emoji-bar"></div>
   <div class="chat-input-row">
-    <input type="text" id="chat-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMessage()" aria-label="Message">
+    <input type="text" id="chat-input" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendMessage()" aria-label="Message">
     <button class="chat-send" onclick="sendMessage()" aria-label="Send"><i class="ti ti-send" aria-hidden="true"></i></button>
   </div>
 </div>
@@ -292,6 +299,7 @@
 <!-- TOAST -->
 <div class="toast" id="toast"><i class="ti ti-check" aria-hidden="true" id="toast-icon"></i><span id="toast-msg"></span></div>
 
+<script src="api.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

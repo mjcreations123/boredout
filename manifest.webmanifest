@@ -1,13 +1,13 @@
 {
-  "name": "BoredOut — Never be bored again",
+  "name": "BoredOut — Find something to do",
   "short_name": "BoredOut",
-  "description": "Find things to do near you and people to do them with. Beat boredom in one tap.",
+  "description": "Find things to do near you and people to do them with. Turn an idle afternoon into a plan.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#13131f",
-  "theme_color": "#7F77DD",
+  "background_color": "#F1ECE4",
+  "theme_color": "#F1ECE4",
   "categories": ["lifestyle", "social", "entertainment"],
   "icons": [
     { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" },
